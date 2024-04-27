@@ -57,6 +57,13 @@ func (e *exporter) Start(ctx context.Context) error {
 			return fmt.Errorf("too many errors! recent: %w", e.onErrors.Recent())
 		}
 
+		if e.onErrors.Failing() && time.Since(e.clientRefreshTime) > 2*time.Minute {
+			log.Warn().Err(e.onErrors.Recent()).Msg("failing, re-initializing client")
+			e.client.Close()
+			e.client = e.config.Franzgo()
+			e.clientRefreshTime = time.Now()
+		}
+
 		select {
 		case <-ctx.Done():
 			return nil
@@ -68,13 +75,6 @@ func (e *exporter) Start(ctx context.Context) error {
 			}
 
 			e.onErrors.Record(nil)
-
-			if e.onErrors.Failing() && time.Since(e.clientRefreshTime) > 2*time.Minute {
-				log.Warn().Err(e.onErrors.Recent()).Msg("failing, re-initializing client")
-				e.client.Close()
-				e.client = e.config.Franzgo()
-				e.clientRefreshTime = time.Now()
-			}
 		}
 	}
 }
