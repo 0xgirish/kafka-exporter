@@ -19,6 +19,10 @@ type exporter struct {
 	client  *kadm.Client
 
 	onErrors fail.OnErrors
+
+	config Config
+
+	clientRefreshTime time.Time
 }
 
 func NewExporter(conf Config) *exporter {
@@ -30,7 +34,42 @@ func NewExporter(conf Config) *exporter {
 		metrics: newMetrics(reg),
 		client:  conf.Franzgo(),
 
-		onErrors: fail.OnErrors{Max: conf.ContinuousFailures},
+		onErrors:          fail.OnErrors{Max: conf.ContinuousFailures},
+		config:            conf,
+		clientRefreshTime: time.Now(),
+	}
+}
+
+func (e *exporter) Start(ctx context.Context) error {
+	t := time.NewTicker(e.d)
+	defer t.Stop()
+
+	for {
+		if e.onErrors.Fail() {
+			// if we have too many errors, we should stop collecting metrics and fail the container
+			// so sre can investigate the issue
+			return fmt.Errorf("too many errors! recent: %w", e.onErrors.Recent())
+		}
+
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-t.C:
+			if err := e.export(context.Background()); err != nil {
+				e.onErrors.Record(err)
+				log.Error().Err(err).Msg("failed to export metrics")
+				continue
+			}
+
+			e.onErrors.Record(nil)
+
+			if e.onErrors.Failing() && time.Since(e.clientRefreshTime) > 2*time.Minute {
+				log.Warn().Err(e.onErrors.Recent()).Msg("failing, re-initializing client")
+				e.client.Close()
+				e.client = e.config.Franzgo()
+				e.clientRefreshTime = time.Now()
+			}
+		}
 	}
 }
 
@@ -196,32 +235,6 @@ func (e *exporter) export(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-func (e *exporter) Start(ctx context.Context) error {
-	t := time.NewTicker(e.d)
-	defer t.Stop()
-
-	for {
-		if e.onErrors.Fail() {
-			// if we have too many errors, we should stop collecting metrics and fail the container
-			// so sre can investigate the issue
-			return fmt.Errorf("too many errors! recent: %w", e.onErrors.Recent())
-		}
-
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-t.C:
-			if err := e.export(context.Background()); err != nil {
-				e.onErrors.Record(err)
-				log.Error().Err(err).Msg("failed to export metrics")
-				continue
-			}
-
-			e.onErrors.Record(nil)
-		}
-	}
 }
 
 func (e *exporter) Recover() {

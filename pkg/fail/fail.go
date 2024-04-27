@@ -21,6 +21,10 @@ func (o *OnErrors) Fail() bool {
 	return o.errCounter >= o.Max
 }
 
+func (o *OnErrors) Failing() bool {
+	return o.errCounter >= o.Max/2
+}
+
 func (o *OnErrors) Recent() error {
 	return o.recent
 }
