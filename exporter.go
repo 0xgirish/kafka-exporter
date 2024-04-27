@@ -231,11 +231,13 @@ func (e *exporter) export(ctx context.Context) error {
 					"partition":     strconv.Itoa(int(memberLag.Partition)),
 				}).Set(float64(memberLag.Lag))
 
-				e.metrics.group.currentOffset.With(prometheus.Labels{
-					"consumergroup": groupLag.Group,
-					"topic":         memberLag.Topic,
-					"partition":     strconv.Itoa(int(memberLag.Partition)),
-				}).Set(float64(memberLag.Commit.At))
+				if memberLag.Commit.At != -1 {
+					e.metrics.group.currentOffset.With(prometheus.Labels{
+						"consumergroup": groupLag.Group,
+						"topic":         memberLag.Topic,
+						"partition":     strconv.Itoa(int(memberLag.Partition)),
+					}).Set(float64(memberLag.Commit.At))
+				}
 			}
 		}
 	}

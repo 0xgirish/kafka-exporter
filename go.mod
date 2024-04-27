@@ -2,6 +2,8 @@ module github.com/0xgirish/kafka-exporter
 
 go 1.22
 
+replace github.com/twmb/franz-go/pkg/kadm => github.com/0xgirish/franz-go/pkg/kadm v1.11.1
+
 require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/phuslu/log v1.0.92
