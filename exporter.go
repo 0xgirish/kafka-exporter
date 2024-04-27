@@ -44,6 +44,12 @@ func (e *exporter) Start(ctx context.Context) error {
 	t := time.NewTicker(e.d)
 	defer t.Stop()
 
+	// don't wait for the first export cycle to complete
+	if err := e.export(ctx); err != nil {
+		e.onErrors.Record(err)
+		log.Error().Err(err).Msg("failed to export metrics")
+	}
+
 	for {
 		if e.onErrors.Fail() {
 			// if we have too many errors, we should stop collecting metrics and fail the container
