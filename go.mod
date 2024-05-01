@@ -8,7 +8,7 @@ require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/phuslu/log v1.0.92
 	github.com/prometheus/client_golang v1.19.0
-	github.com/twmb/franz-go v1.15.3
+	github.com/twmb/franz-go v1.16.1
 	github.com/twmb/franz-go/pkg/kadm v1.11.0
 	github.com/twmb/franz-go/pkg/kfake v0.0.0-20240412162337-6a58760afaa7
 	github.com/twmb/franz-go/plugin/kphuslog v1.0.0
