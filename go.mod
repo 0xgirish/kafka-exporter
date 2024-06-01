@@ -7,7 +7,7 @@ replace github.com/twmb/franz-go/pkg/kadm => github.com/0xgirish/franz-go/pkg/ka
 require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/phuslu/log v1.0.92
-	github.com/prometheus/client_golang v1.19.0
+	github.com/prometheus/client_golang v1.19.1
 	github.com/twmb/franz-go v1.16.1
 	github.com/twmb/franz-go/pkg/kadm v1.11.0
 	github.com/twmb/franz-go/pkg/kfake v0.0.0-20240412162337-6a58760afaa7
@@ -25,6 +25,6 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.7.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 )
