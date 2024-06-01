@@ -6,7 +6,7 @@ replace github.com/twmb/franz-go/pkg/kadm => github.com/0xgirish/franz-go/pkg/ka
 
 require (
 	github.com/alexflint/go-arg v1.4.3
-	github.com/phuslu/log v1.0.92
+	github.com/phuslu/log v1.0.102
 	github.com/prometheus/client_golang v1.19.0
 	github.com/twmb/franz-go v1.16.1
 	github.com/twmb/franz-go/pkg/kadm v1.11.0
